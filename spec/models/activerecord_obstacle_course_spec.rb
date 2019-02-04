@@ -451,7 +451,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ---------------------
-    Order.sum(:amount)
+    total_sales = Order.sum(:amount)
     # -----------------------------------------------------------
 
     # Expectation
@@ -467,7 +467,7 @@ describe 'ActiveRecord Obstacle Course' do
     # -----------------------------------------------------------
 
     # ------------------ Using ActiveRecord ---------------------
-    Order.where.not(user: @user_2).sum(:amount)
+    total_sales = Order.where.not(user: @user_2).sum(:amount)
     # -----------------------------------------------------------
 
     # Expectation
@@ -478,12 +478,12 @@ describe 'ActiveRecord Obstacle Course' do
     expected_result = [@order_3, @order_11, @order_5, @order_13, @order_10, @order_15, @order_9]
 
     # ------------------ Inefficient Solution -------------------
-    # order_ids = OrderItem.where(item_id: @item_4.id).map(&:order_id)
-    # orders = order_ids.map { |id| Order.find(id) }
+    order_ids = OrderItem.where(item_id: @item_4.id).map(&:order_id)
+    orders = order_ids.map { |id| Order.find(id) }
     # -----------------------------------------------------------
 
     # ------------------ Improved Solution ----------------------
-    Order.joins(:items).where(items: {id: @item_4}).sum(:amount)
+    orders = Order.joins(:items).where(items: {id: @item_4})
     # -----------------------------------------------------------
 
     # Expectation
@@ -494,13 +494,13 @@ describe 'ActiveRecord Obstacle Course' do
     expected_result = [@order_11, @order_5]
 
     # ------------------ Inefficient Solution -------------------
-    orders = Order.where(user: @user_2)
-    order_ids = OrderItem.where(order_id: orders, item: @item_4).map(&:order_id)
-    orders = order_ids.map { |id| Order.find(id) }
+    # orders = Order.where(user: @user_2)
+    # order_ids = OrderItem.where(order_id: orders, item: @item_4).map(&:order_id)
+    # orders = order_ids.map { |id| Order.find(id) }
     # -----------------------------------------------------------
 
     # ------------------ Improved Solution ----------------------
-
+    orders = Order.where(user: @user_2).joins(:items).where(items: {id: @item_4})
     # -----------------------------------------------------------
 
     # Expectation
